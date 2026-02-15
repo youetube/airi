@@ -34,6 +34,13 @@ language:
   title: Language
   description: >
     Change the language of the AIRI interface. This will not affect the language of the character's responses.
+controls-island:
+  icon-size:
+    title: Controls Island Icon Size
+    description: Adjust the size of the controls island icons
+    auto: Auto (responsive)
+    large: Large (default)
+    small: Small
 live2d:
   change-model:
     from-file: Load from File
@@ -64,6 +71,11 @@ live2d:
     title: Disable model mouse tracking
     button-disable:
       title: Disable
+  fps:
+    title: FPS
+    description: Limit rendering frame rate
+    options:
+      unlimited: No Limit
 microphone: Microphone
 models: Model
 pages:
@@ -72,9 +84,12 @@ pages:
     active: Active
     active_badge: Currently Active
     cancel: Cancel action
+    save: Save changes
     card_not_found: Card not found
     character: Character
     close: Close
+    chat:
+      provider: Chat / Provider
     consciousness:
       model: Consciousness / Model
     created_by: created by
@@ -86,6 +101,7 @@ pages:
     description_label: Description
     drop_here: Drop to upload
     create_card: Create a new Card
+    edit_card: Edit Card
     creation:
       identity: Identity
       name: Name
@@ -102,6 +118,9 @@ pages:
         scenario: You recently woke up and forgot everything about your previous life.
         systemprompt: You will receive messages, answer to them like a real human.
         posthistoryinstructions: Remember to imitate an human.
+      modules_info: Configure modules for this character card. If not set, default module configuration will be used.
+      use_default: Use default
+      use_default_not_configured: Use default (not configured)
       fields_info:
         subtitle: >-
           You can put here some details about the character you are creating, explain his history and context, and how your interactions should be answered.
@@ -118,6 +137,8 @@ pages:
         posthistoryinstructions: Place here anything the AI LLM should read after the messages history.
         version: >-
           Card version, you should increase this if you are making changes from a previous card.
+        consciousness_model: Select the consciousness model (AI model) for this character.
+        speech_model: Select the speech synthesis model and voice for this character.
       errors:
         name: Name should be valid or non-empty.
         version: 'Error: Invalid version number !'
@@ -138,6 +159,7 @@ pages:
     search: Search cards...
     sort_by: Sort by
     speech:
+      provider: Speech / Provider
       model: Speech / Model
       voice: Speech / Voice
     systemprompt: System Prompt
@@ -280,7 +302,7 @@ pages:
             search_results: Found {count} of {total} models
             show_less: Show less
             show_more: Show more
-            subtitle: Select a model from the provider
+            subtitle: Select a default model from the provider
             title: Model
       title: Consciousness
     description: Thinking, vision, speech synthesis, gaming, etc.
@@ -343,6 +365,7 @@ pages:
               stop:
                 label: Stop
             select-voice:
+              loading: Loading model...
               required: Please select a voice
           provider-voice-selection:
             custom_model_placeholder: Enter custom model name...
@@ -592,6 +615,30 @@ pages:
           validation:
             error-missing-api-key: Please enter an API key to test the voice.
         title: ElevenLabs
+      kokoro-local:
+        description: Local text-to-speech using Kokoro-82M.
+        fields:
+          field:
+            model:
+              label: Model Selection
+              description: Smaller models load faster but may have slightly lower quality.
+        models:
+          fp32-webgpu:
+            description: Full precision model using WebGPU - Recommended for supported devices
+          fp32:
+            description: Full precision model
+          fp16:
+            description: Half precision
+          q8:
+            description: 8-bit quantized
+          q4:
+            description: 4-bit quantized
+          q4f16:
+            description: 4-bit with FP16
+        playground:
+          default-text: Hello! This is a test of the Kokoro text-to-speech system.
+          title: Voice Playground
+        title: Kokoro TTS (Local)
       fireworks:
         description: fireworks.ai
         title: Fireworks.ai
@@ -606,6 +653,8 @@ pages:
       index-tts-vllm:
         description: https://index-tts.github.io/
         title: Bilibili / IndexTTS
+        callout_indextts2_unavailable_title: Limited Support
+        callout_indextts2_unavailable: Support for IndexTTS2 is currently unavailable. Please use IndexTTS.
       azure-ai-foundry:
         description: Azure AI Foundry
         title: Azure AI Foundry
@@ -630,6 +679,9 @@ pages:
       openai-compatible:
         description: OpenAI Compatible
         title: OpenAI Compatible
+      n1n:
+        description: n1n.ai - High-performance AI API provider.
+        title: n1n
       openrouter:
         description: openrouter.ai
         title: OpenRouter
@@ -680,10 +732,20 @@ pages:
       aliyun-nls:
         description: Aliyun NLS
         title: Aliyun NLS
+      browser-web-speech-api:
+        description: Browser-native STT (requires Chrome/Edge/Safari)
+        title: Web Speech API
       transcriptions:
         playground:
           title: Transcription Playground
     title: Providers
+  connection:
+    description: Configure WebSocket server connection
+    title: Connection
+    websocket-url:
+      description: Full address of the WebSocket server (e.g., ws://localhost:6121/ws)
+      label: WebSocket Server Address
+      placeholder: ws://localhost:6121/ws
   scene:
     description: Configure the environment where the character lives
     title: Scene
@@ -721,6 +783,41 @@ pages:
               use-magic-keys:
                 title: useMagicKeys
                 description: Test shortcuts
+              audio-record:
+                title: Audio Record
+                description: Test Audio related composables
+              background-gradient-blending:
+                title: Background Theme color blending
+                description: Test blending & theme
+              background-removal:
+                title: Background removal (WebGPU required)
+                description: Utility for background removal
+              chat:
+                title: Chat
+                description: Chat
+              gesture-circle:
+                title: Gesture Circle (Desktop only)
+                description: Test gesture recognition
+              image:
+                title: Image
+                description: Image
+              polaroid:
+                title: Polaroid
+                description: Utility for taking shots of models
+              context-flow:
+                description: Inspect incoming context updates and outgoing chat stream events
+              websocket-inspector:
+                title: WebSocket Inspector
+                description: Inspect raw WebSocket traffic
+              vibrant:
+                title: Color extract
+                description: Test color extraction
+              providers-transcription-realtime-aliyun-nls:
+                title: Aliyun Real-time Transcriber
+                description: Stream microphone audio to Aliyun NLS and inspect live transcripts
+              performance-playground:
+                title: Performance Playground
+                description: 'Test performance runtime: VRM expressions + TTS lip sync'
         theme-presets:
           presets:
             default:
@@ -846,6 +943,10 @@ vrm:
   skybox:
     skybox-intensity: SkyBox Intensity
     skybox-specular-mix: Specular Mix
+websocket-secure-enabled:
+  title: 보안 WebSocket (WSS) 활성화
+  description: >-
+    개발 모드에서 모바일(pocket)의 HTTPS 연결을 허용하기 위해 WSS(WebSocket Secure)를 활성화합니다. 자체 서명 인증서가 자동으로 생성됩니다.
 wip:
   title: Work in Progress
   description: >-

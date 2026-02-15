@@ -71,6 +71,14 @@ export default defineConfig({
   build: {
     sourcemap: true,
   },
+  worker: {
+    format: 'es',
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: false,
+      },
+    },
+  },
 
   plugins: [
     Info(),
@@ -97,6 +105,7 @@ export default defineConfig({
         resolve(import.meta.dirname, 'src', 'pages'),
         resolve(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src', 'pages'),
       ],
+      exclude: ['**/components/**'],
     }),
 
     // https://github.com/JohnCampionJr/vite-plugin-vue-layouts

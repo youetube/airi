@@ -1,9 +1,10 @@
-import type { ChatHistoryItem } from '../types/chat'
+import type { ChatSessionsExport } from '../types/chat-session'
 
 import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { useLive2d } from '@proj-airi/stage-ui-live2d'
 
-import { useChatStore } from '../stores/chat'
+import { useChatOrchestratorStore } from '../stores/chat'
+import { useChatSessionStore } from '../stores/chat/session-store'
 import { useDisplayModelsStore } from '../stores/display-models'
 import { useMcpStore } from '../stores/mcp'
 import { useAiriCardStore } from '../stores/modules/airi-card'
@@ -19,7 +20,8 @@ import { useProvidersStore } from '../stores/providers'
 import { useSettings, useSettingsAudioDevice } from '../stores/settings'
 
 export function useDataMaintenance() {
-  const chatStore = useChatStore()
+  const chatStore = useChatSessionStore()
+  const chatOrchestrator = useChatOrchestratorStore()
   const displayModelsStore = useDisplayModelsStore()
   const providersStore = useProvidersStore()
   const settingsStore = useSettings()
@@ -57,24 +59,25 @@ export function useDataMaintenance() {
   }
 
   function deleteAllChatSessions() {
+    chatOrchestrator.cancelPendingSends()
     chatStore.resetAllSessions()
   }
 
-  function exportChatSessions() {
-    const data = chatStore.getAllSessions()
+  async function exportChatSessions() {
+    const data = await chatStore.exportSessions()
     return new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
   }
 
-  function importChatSessions(payload: Record<string, unknown>) {
-    const normalizedPayload = payload as Record<string, unknown>
-    const sessions: Record<string, ChatHistoryItem[]> = {}
+  function isChatSessionsPayload(payload: unknown): payload is ChatSessionsExport {
+    if (!payload || typeof payload !== 'object')
+      return false
+    return (payload as { format?: string }).format === 'chat-sessions-index:v1'
+  }
 
-    for (const [sessionId, messages] of Object.entries(normalizedPayload)) {
-      if (Array.isArray(messages))
-        sessions[sessionId] = messages as ChatHistoryItem[]
-    }
-
-    chatStore.replaceSessions(sessions)
+  async function importChatSessions(payload: Record<string, unknown>) {
+    if (!isChatSessionsPayload(payload))
+      throw new Error('Invalid chat session export format')
+    await chatStore.importSessions(payload)
   }
 
   async function resetSettingsState() {

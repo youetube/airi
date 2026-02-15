@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { defaultModelParameters, useLive2d } from '@proj-airi/stage-ui-live2d'
-import { Button, Checkbox, FieldRange } from '@proj-airi/ui'
+import { Button, Checkbox, FieldRange, SelectTab } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useSettings } from '../../../../stores/settings'
@@ -19,7 +19,14 @@ defineEmits<{
 const { t } = useI18n()
 
 const settings = useSettings()
-const { live2dDisableFocus, live2dIdleAnimationEnabled, live2dAutoBlinkEnabled, live2dForceAutoBlinkEnabled, live2dShadowEnabled } = storeToRefs(settings)
+const {
+  live2dDisableFocus,
+  live2dIdleAnimationEnabled,
+  live2dAutoBlinkEnabled,
+  live2dForceAutoBlinkEnabled,
+  live2dShadowEnabled,
+  live2dMaxFps,
+} = storeToRefs(settings)
 
 const live2d = useLive2d()
 const {
@@ -33,6 +40,11 @@ const selectedRuntimeMotion = ref<string>('')
 const selectedRuntimeMotionName = ref<string>('')
 const runtimeMotions = ref<Array<{ name: string, fullPath: string, displayPath: string, group: string, index: number }>>([])
 const showMotionSelector = ref(false)
+const fpsOptions = computed(() => [
+  { value: 0, label: t('settings.live2d.fps.options.unlimited') },
+  { value: 60, label: '60' },
+  { value: 30, label: '30' },
+])
 
 // Get available runtime motions from the model
 onMounted(() => {
@@ -326,6 +338,18 @@ onUnmounted(() => {
           </button>
         </div>
       </div>
+    </div>
+
+    <div :class="['mt-4', 'flex', 'items-center', 'justify-between']">
+      <div :class="['flex', 'flex-col', 'gap-1']">
+        <span :class="['text-sm', 'text-neutral-600', 'dark:text-neutral-400']">
+          {{ t('settings.live2d.fps.title') }}
+        </span>
+        <span :class="['text-xs', 'text-neutral-500', 'dark:text-neutral-400']">
+          {{ t('settings.live2d.fps.description') }}
+        </span>
+      </div>
+      <SelectTab v-model="live2dMaxFps" :options="fpsOptions" size="sm" :class="['w-48', 'shrink-0']" />
     </div>
 
     <div mt-4 flex items-center justify-between>

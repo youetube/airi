@@ -42,10 +42,11 @@ const {
   live2dAutoBlinkEnabled,
   live2dForceAutoBlinkEnabled,
   live2dShadowEnabled,
+  live2dMaxFps,
 } = storeToRefs(settingsStore)
 
 watch(selectedModel, async () => {
-  stageModelSelected.value = selectedModel.value?.id
+  stageModelSelected.value = selectedModel.value?.id ?? ''
   await settingsStore.updateStageModel()
 
   if (selectedModel.value) {
@@ -85,8 +86,16 @@ watch(selectedModel, async () => {
         Select Model
       </Button>
     </ModelSelectorDialog>
-    <Live2D v-if="stageModelRenderer === 'live2d'" :palette="palette" @extract-colors-from-model="$emit('extractColorsFromModel')" />
-    <VRM v-if="stageModelRenderer === 'vrm'" :palette="palette" @extract-colors-from-model="$emit('extractColorsFromModel')" />
+    <Live2D
+      v-if="stageModelRenderer === 'live2d'"
+      :palette="palette"
+      @extract-colors-from-model="$emit('extractColorsFromModel')"
+    />
+    <VRM
+      v-if="stageModelRenderer === 'vrm'"
+      :palette="palette"
+      @extract-colors-from-model="$emit('extractColorsFromModel')"
+    />
   </div>
   <!-- Live2D component for 2D stage view -->
   <template v-if="stageModelRenderer === 'live2d'">
@@ -102,6 +111,7 @@ watch(selectedModel, async () => {
         :live2d-auto-blink-enabled="live2dAutoBlinkEnabled"
         :live2d-force-auto-blink-enabled="live2dForceAutoBlinkEnabled"
         :live2d-shadow-enabled="live2dShadowEnabled"
+        :live2d-max-fps="live2dMaxFps"
       />
     </div>
   </template>

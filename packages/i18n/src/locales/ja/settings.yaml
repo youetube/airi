@@ -34,6 +34,13 @@ language:
   title: 言語
   description: >
     AIRIインターフェースの言語を変更します。これはキャラクターの応答言語には影響しません。
+controls-island:
+  icon-size:
+    title: アイランドアイコンのサイズを制御
+    description: アイランドアイコンのサイズを調整します
+    auto: 自動 (レスポンシブ)
+    large: 大 (デフォルト)
+    small: 小
 live2d:
   change-model:
     from-file: ファイルから読み込む
@@ -64,6 +71,11 @@ live2d:
     title: モデルのマウストラッキングを無効にする
     button-disable:
       title: 無効
+  fps:
+    title: FPS
+    description: Limit rendering frame rate
+    options:
+      unlimited: No Limit
 microphone: マイク
 models: モデル
 pages:
@@ -72,9 +84,12 @@ pages:
     active: 有効
     active_badge: 現在有効
     cancel: 操作の取消
+    save: 変更を保存
     card_not_found: カードが見つかりません
     character: キャラクター
     close: 閉じる
+    chat:
+      provider: Chat / Provider
     consciousness:
       model: 意識 / モデル
     created_by: 作成者
@@ -86,6 +101,7 @@ pages:
     description_label: 説明
     drop_here: アップロードするにはここにドラッグ
     create_card: 新しいカードを作成
+    edit_card: カードを編集
     creation:
       identity: 識別子
       name: 名前
@@ -102,6 +118,9 @@ pages:
         scenario: あなたは最近目覚め、前世のすべてを忘れてしまいました。
         systemprompt: 受け取ったメッセージに、本物の人間のように答えてください。
         posthistoryinstructions: 人間の真似をすることを忘れないでください。
+      modules_info: Configure modules for this character card. If not set, default module configuration will be used.
+      use_default: Use default
+      use_default_not_configured: Use default (not configured)
       fields_info:
         subtitle: >-
           ここに作成するキャラクターの詳細、履歴とコンテキスト、 およびあなたにどう返答してほしいか記述できます。
@@ -118,6 +137,8 @@ pages:
         posthistoryinstructions: メッセージ履歴の後にAI LLMに読んでほしい内容をここに配置してください。
         version: >-
           カードのバージョン。以前のカードから変更を加える場合は、これを増やす必要があります。
+        consciousness_model: Select the consciousness model (AI model) for this character.
+        speech_model: Select the speech synthesis model and voice for this character.
       errors:
         name: 名前は有効であるか、空でない必要があります。
         version: 'エラー: 無効なバージョン番号です！'
@@ -138,6 +159,7 @@ pages:
     search: カードを検索…
     sort_by: 並び替え
     speech:
+      provider: Speech / Provider
       model: 発話/モデル
       voice: 発話/音声
     systemprompt: システムプロンプト
@@ -183,7 +205,7 @@ pages:
         reset: デスクトップのデータをリセット
     confirmations:
       tooltip: 本当によろしいですか？
-      'yes': 'Yes'
+      'yes': 'はい'
     status:
       exported: チャットセッションをエクスポートしました。
       imported: チャットセッションをインポートしました。
@@ -280,7 +302,7 @@ pages:
             search_results: 結果{total}個中{count}個のモデルが見つかりました
             show_less: 表示を減らす
             show_more: もっと表示
-            subtitle: プロバイダーからモデルを選択
+            subtitle: Select a default model from the provider
             title: モデル
       title: 意識
     description: 思考、視覚、音声合成、ゲームなど。
@@ -343,6 +365,7 @@ pages:
               stop:
                 label: 停止
             select-voice:
+              loading: Loading model...
               required: 音声を選択してください
           provider-voice-selection:
             custom_model_placeholder: カスタムモデル名を入力…
@@ -409,63 +432,63 @@ pages:
         AIRIが正常に思考し動作するためには、少なくとも1つの{chat}プロバイダーの設定が必要です。 これはAIRIシステム内に存在するキャラクターの脳と考えることができます。
     catalog:
       edit:
-        config-id-not-found: Provider configuration not found.
-        definition-id-not-found: Provider definition not found.
+        config-id-not-found: プロバイダ設定が見つかりません。
+        definition-id-not-found: プロバイダーの定義が見つかりません。
         actions:
-          more-options: More options
-          delete: Delete
+          more-options: その他のオプション
+          delete: 削除
         validation:
           failed:
-            title: Please check your provider settings, validation failed.
-            description: You can still save the current configuration if you want to proceed.
-            action: Save anyway
+            title: プロバイダ設定を確認してください。認証に失敗しました。
+            description: 続行する場合は、現在の設定を保存することができます。
+            action: このまま保存
         config:
           common:
             fields:
               field:
                 api-key:
-                  label: API Key
-                  description: API Key used to authorize requests to this provider
-                  placeholder: sk-...
+                  label: APIキー
+                  description: このプロバイダへのリクエストを承認するために使用されるAPIキー
+                  placeholder: sk-…
                 base-url:
-                  label: Base URL
+                  label: ベースURL
                   description: >-
-                    The base url used to connect to remote service. Often looks like http://localhost:11434/v1 or https://example.com/v1.
-                  placeholder: Base url...
+                    リモートサービスへの接続に使用されるベースURL。多くの場合、http://localhost:11434/v1 または https://example.com/v1 のようになります。
+                  placeholder: ベースURL…
                 headers:
-                  label: Custom HTTP Headers
-                  description: Add custom HTTP headers
+                  label: カスタムHTTPヘッダー
+                  description: カスタムHTTPヘッダーを追加
                   key:
-                    placeholder: Key
+                    placeholder: キー
                   value:
-                    placeholder: Value
+                    placeholder: 値
         validators:
           actions:
-            validate: Validate
-          empty: No validation steps available.
+            validate: 検証
+          empty: 検証ステップは利用できません。
           openai-compatible:
             check-config:
-              title: Configuration
+              title: 構成
             check-connectivity:
-              title: Connectivity
+              title: 接続性
             check-supports-model-listing:
-              title: List Models
+              title: モデル一覧
             check-supports-chat-completion:
-              title: Chat Completion
+              title: チャット補完
           status:
-            validating: Validating...
-            valid: Passed
-            invalid: Errored
-          title: Checks
+            validating: 検証中…
+            valid: 検証成功
+            invalid: エラー
+          title: チェック
         providers:
           provider:
             ollama:
               troubleshooting:
                 validators:
                   openai-compatible-check-connectivity:
-                    label: Extra configuration needed for Ollama
+                    label: Ollamaに追加設定が必要です
                     content: >-
-                      Sorry to hear that Connectivity check failed for Ollama. Don't worry, for Ollama instances, extra configuration is needed for making it pass for Ollama. You need to set <code>OLLAMA_HOST</code> explicitly when start the Ollama application or Ollama CLI server, for detailed information, check <a href="https://airi.moeru.ai/docs/en/docs/manual/integrations/providers/chat/ollama">Ollama integration guide</a>.
+                      残念ながら、Ollamaの接続チェックが失敗したようです。Ollamaインスタンスの場合、正常に動作させるためには追加の設定が必要です。OllamaアプリケーションまたはOllama CLIサーバーを起動する際には、<code>OLLAMA_HOST</code>環境変数を明示的に設定する必要があります。詳細な手順については、<a href="https://airi.moeru.ai/docs/en/docs/manual/integrations/providers/chat/ollama">Ollama統合ガイド</a>をご参照ください。
     common:
       continueAnyway: 続行する
       fields:
@@ -592,6 +615,30 @@ pages:
           validation:
             error-missing-api-key: 音声をテストするにはAPIキーを入力してください。
         title: ElevenLabs
+      kokoro-local:
+        description: Local text-to-speech using Kokoro-82M.
+        fields:
+          field:
+            model:
+              label: Model Selection
+              description: Smaller models load faster but may have slightly lower quality.
+        models:
+          fp32-webgpu:
+            description: Full precision model using WebGPU - Recommended for supported devices
+          fp32:
+            description: Full precision model
+          fp16:
+            description: Half precision
+          q8:
+            description: 8-bit quantized
+          q4:
+            description: 4-bit quantized
+          q4f16:
+            description: 4-bit with FP16
+        playground:
+          default-text: Hello! This is a test of the Kokoro text-to-speech system.
+          title: Voice Playground
+        title: Kokoro TTS (Local)
       fireworks:
         description: fireworks.ai
         title: Fireworks.ai
@@ -606,6 +653,8 @@ pages:
       index-tts-vllm:
         description: https://index-tts.github.io/
         title: Bilibili/IndexTTS
+        callout_indextts2_unavailable_title: Limited Support
+        callout_indextts2_unavailable: Support for IndexTTS2 is currently unavailable. Please use IndexTTS.
       azure-ai-foundry:
         description: Azure AI Foundry
         title: Azure AI Foundry
@@ -630,6 +679,9 @@ pages:
       openai-compatible:
         description: OpenAI互換
         title: OpenAI互換
+      n1n:
+        description: n1n.ai - 高性能なAI APIプロバイダー。
+        title: n1n
       openrouter:
         description: openrouter.ai
         title: OpenRouter
@@ -680,10 +732,20 @@ pages:
       aliyun-nls:
         description: Aliyun NLS
         title: Aliyun NLS
+      browser-web-speech-api:
+        description: ブラウザネイティブSTT (Chrome/Edge/Safariが必要)
+        title: Web Speech API
       transcriptions:
         playground:
           title: 文字起こし実験場
     title: プロバイダー
+  connection:
+    description: WebSocketサーバー接続の設定
+    title: 接続
+    websocket-url:
+      description: 'WebSocket サーバーの完全なアドレス (例: ws://localhost:6121/ws)'
+      label: WebSocket サーバーアドレス
+      placeholder: ws://localhost:6121/ws
   scene:
     description: キャラクターが過ごす環境を設定する
     title: シーン
@@ -713,14 +775,49 @@ pages:
           sections:
             section:
               performance-visualizer:
-                title: Performance Visualizer
-                description: Toggle FPS/long task/memory overlay
+                title: パフォーマンスビジュアライザー
+                description: FPS/ロングタスク/メモリーオーバーレイの切り替え
               markdown-stress:
-                title: Markdown Stress
-                description: Stress markdown parsing and rendering with heavy chat payloads
+                title: Markdown ストレス
+                description: 大量のチャットデータを含むMarkdownの解析とレンダリング負荷のテスト
               use-magic-keys:
                 title: マジックキーを使用
                 description: ショートカットをテスト
+              audio-record:
+                title: Audio Record
+                description: Test Audio related composables
+              background-gradient-blending:
+                title: Background Theme color blending
+                description: Test blending & theme
+              background-removal:
+                title: Background removal (WebGPU required)
+                description: Utility for background removal
+              chat:
+                title: Chat
+                description: Chat
+              gesture-circle:
+                title: Gesture Circle (Desktop only)
+                description: Test gesture recognition
+              image:
+                title: Image
+                description: Image
+              polaroid:
+                title: Polaroid
+                description: Utility for taking shots of models
+              context-flow:
+                description: Inspect incoming context updates and outgoing chat stream events
+              websocket-inspector:
+                title: WebSocket Inspector
+                description: Inspect raw WebSocket traffic
+              vibrant:
+                title: Color extract
+                description: Test color extraction
+              providers-transcription-realtime-aliyun-nls:
+                title: Aliyun Real-time Transcriber
+                description: Stream microphone audio to Aliyun NLS and inspect live transcripts
+              performance-playground:
+                title: Performance Playground
+                description: 'Test performance runtime: VRM expressions + TTS lip sync'
         theme-presets:
           presets:
             default:
@@ -846,6 +943,10 @@ vrm:
   skybox:
     skybox-intensity: スカイボックスの強度
     skybox-specular-mix: 鏡面反射の混合
+websocket-secure-enabled:
+  title: セキュア WebSocket (WSS) を有効にする
+  description: >-
+    開発モードでモバイル（pocket）のHTTPS接続を許可するために、WSS（WebSocket Secure）を有効にします。これにより自己署名証明書が自動的に生成されます。
 wip:
   title: 開発中
   description: >-

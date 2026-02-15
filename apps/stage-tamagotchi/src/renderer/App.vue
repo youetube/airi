@@ -3,13 +3,15 @@ import { defineInvoke, defineInvokeHandler } from '@moeru/eventa'
 import { themeColorFromValue, useThemeColor } from '@proj-airi/stage-layouts/composables/theme-color'
 import { ToasterRoot } from '@proj-airi/stage-ui/components'
 import { useSharedAnalyticsStore } from '@proj-airi/stage-ui/stores/analytics'
-import { useCharacterOrchestratorStore } from '@proj-airi/stage-ui/stores/character-orchestrator'
+import { useCharacterOrchestratorStore } from '@proj-airi/stage-ui/stores/character'
+import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
 import { useDisplayModelsStore } from '@proj-airi/stage-ui/stores/display-models'
 import { useModsServerChannelStore } from '@proj-airi/stage-ui/stores/mods/api/channel-server'
 import { useContextBridgeStore } from '@proj-airi/stage-ui/stores/mods/api/context-bridge'
 import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
 import { useOnboardingStore } from '@proj-airi/stage-ui/stores/onboarding'
 import { usePerfTracerBridgeStore } from '@proj-airi/stage-ui/stores/perf-tracer-bridge'
+import { listProvidersForPluginHost, shouldPublishPluginHostCapabilities } from '@proj-airi/stage-ui/stores/plugin-host-capabilities'
 import { useSettings } from '@proj-airi/stage-ui/stores/settings'
 import { useTheme } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
@@ -20,8 +22,15 @@ import { toast, Toaster } from 'vue-sonner'
 
 import ResizeHandler from './components/ResizeHandler.vue'
 
-import { electronOpenSettings, electronStartTrackMousePosition } from '../shared/eventa'
-import { useElectronEventaContext } from './composables/electron-vueuse'
+import {
+  electronOpenSettings,
+  electronPluginUpdateCapability,
+  electronStartTrackMousePosition,
+  electronStartWebSocketServer,
+  pluginProtocolListProviders,
+  pluginProtocolListProvidersEventName,
+} from '../shared/eventa'
+import { useElectronEventaContext, useElectronEventaInvoke } from './composables/electron-vueuse'
 
 const { isDark: dark } = useTheme()
 const i18n = useI18n()
@@ -33,6 +42,7 @@ const onboardingStore = useOnboardingStore()
 const router = useRouter()
 const route = useRoute()
 const cardStore = useAiriCardStore()
+const chatSessionStore = useChatSessionStore()
 const serverChannelStore = useModsServerChannelStore()
 const characterOrchestratorStore = useCharacterOrchestratorStore()
 const analyticsStore = useSharedAnalyticsStore()
@@ -47,14 +57,17 @@ watch(dark, () => updateThemeColor(), { immediate: true })
 watch(route, () => updateThemeColor(), { immediate: true })
 onMounted(() => updateThemeColor())
 
-// FIXME: store settings to file
+const startWebSocketServer = useElectronEventaInvoke(electronStartWebSocketServer)
+
 onMounted(async () => {
   analyticsStore.initialize()
   cardStore.initialize()
   onboardingStore.initializeSetupCheck()
 
+  await chatSessionStore.initialize()
   await displayModelsStore.loadDisplayModelsFromIndexedDB()
   await settingsStore.initializeStageModel()
+  await startWebSocketServer({ websocketSecureEnabled: settingsStore.websocketSecureEnabled })
 
   await serverChannelStore.initialize({ possibleEvents: ['ui:configure'] }).catch(err => console.error('Failed to initialize Mods Server Channel in App.vue:', err))
   await contextBridgeStore.initialize()
@@ -62,7 +75,21 @@ onMounted(async () => {
 
   const context = useElectronEventaContext()
   const startTrackingCursorPoint = defineInvoke(context.value, electronStartTrackMousePosition)
+  const reportPluginCapability = defineInvoke(context.value, electronPluginUpdateCapability)
   await startTrackingCursorPoint()
+
+  // Expose stage provider definitions to plugin host APIs.
+  defineInvokeHandler(context.value, pluginProtocolListProviders, async () => listProvidersForPluginHost())
+
+  if (shouldPublishPluginHostCapabilities()) {
+    await reportPluginCapability({
+      key: pluginProtocolListProvidersEventName,
+      state: 'ready',
+      metadata: {
+        source: 'stage-ui',
+      },
+    })
+  }
 
   // Listen for open-settings IPC message from main process
   defineInvokeHandler(context.value, electronOpenSettings, () => router.push('/settings'))

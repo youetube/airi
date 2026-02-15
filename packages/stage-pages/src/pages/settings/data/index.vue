@@ -39,9 +39,9 @@ async function runAction(action: () => Promise<void> | void, successKey: string)
   }
 }
 
-function triggerExport() {
+async function triggerExport() {
   try {
-    const blob = exportChatSessions()
+    const blob = await exportChatSessions()
     const url = URL.createObjectURL(blob)
     const anchor = document.createElement('a')
     anchor.href = url
@@ -70,7 +70,7 @@ async function handleImport(event: Event) {
   try {
     const raw = await file.text()
     const parsed = JSON.parse(raw) as Record<string, unknown>
-    importChatSessions(parsed)
+    await importChatSessions(parsed)
     setStatus(t('settings.pages.data.status.imported'))
     importError.value = ''
   }
@@ -115,7 +115,7 @@ async function handleImport(event: Event) {
               {{ t('settings.pages.data.confirmations.yes') }}
             </template>
             <template #cancel>
-              {{ t('pages.card.cancel') }}
+              {{ t('settings.pages.card.cancel') }}
             </template>
           </DoubleCheckButton>
         </div>
@@ -147,7 +147,7 @@ async function handleImport(event: Event) {
                 {{ t('settings.pages.data.confirmations.yes') }}
               </template>
               <template #cancel>
-                {{ t('pages.card.cancel') }}
+                {{ t('settings.pages.card.cancel') }}
               </template>
             </DoubleCheckButton>
           </div>
@@ -172,7 +172,7 @@ async function handleImport(event: Event) {
                 {{ t('settings.pages.data.confirmations.yes') }}
               </template>
               <template #cancel>
-                {{ t('pages.card.cancel') }}
+                {{ t('settings.pages.card.cancel') }}
               </template>
             </DoubleCheckButton>
           </div>
@@ -213,7 +213,7 @@ async function handleImport(event: Event) {
                       {{ t('settings.pages.data.confirmations.yes') }}
                     </template>
                     <template #cancel>
-                      {{ t('pages.card.cancel') }}
+                      {{ t('settings.pages.card.cancel') }}
                     </template>
                   </DoubleCheckButton>
                 </div>
@@ -240,7 +240,7 @@ async function handleImport(event: Event) {
                       {{ t('settings.pages.data.confirmations.yes') }}
                     </template>
                     <template #cancel>
-                      {{ t('pages.card.cancel') }}
+                      {{ t('settings.pages.card.cancel') }}
                     </template>
                   </DoubleCheckButton>
                 </div>
@@ -274,7 +274,7 @@ async function handleImport(event: Event) {
               {{ t('settings.pages.data.confirmations.yes') }}
             </template>
             <template #cancel>
-              {{ t('pages.card.cancel') }}
+              {{ t('settings.pages.card.cancel') }}
             </template>
           </DoubleCheckButton>
         </div>
@@ -286,6 +286,12 @@ async function handleImport(event: Event) {
 <route lang="yaml">
 meta:
   layout: settings
+  titleKey: settings.pages.data.title
+  subtitleKey: settings.title
+  descriptionKey: settings.pages.data.description
+  icon: i-solar:database-bold-duotone
+  settingsEntry: true
+  order: 7
   stageTransition:
     name: slide
     pageSpecificAvailable: true

@@ -15,6 +15,8 @@ words:
   - allseto
   - animejs
   - APNG
+  - Armbruster
+  - asar
   - astrojs
   - Attributify
   - attw
@@ -34,6 +36,7 @@ words:
   - buildless
   - bumpp
   - byteorder
+  - Catap
   - catppuccin
   - cdylib
   - cerebras
@@ -136,6 +139,7 @@ words:
   - keyup
   - Keyyable
   - kirakira
+  - knip
   - kwaa
   - lemonneko
   - lemonnekogh
@@ -208,6 +212,7 @@ words:
   - OPFS
   - opusscript
   - otelcol
+  - owenthereal
   - oxlint
   - pglite
   - pgvector
@@ -227,8 +232,10 @@ words:
   - prismarine
   - prng
   - pthread
+  - pulseaudio
   - quanlai
   - qwen
+  - rafta
   - Raycaster
   - rdev
   - rehype
@@ -266,8 +273,10 @@ words:
   - ssml
   - staticlib
   - stepfun
+  - sumimakito
   - supergroup
   - superjson
+  - systempreferences
   - tamagotchi
   - tauri
   - taze
@@ -288,6 +297,7 @@ words:
   - unocss
   - unplugin
   - unspeech
+  - upterm
   - valibot
   - vaul
   - velin
@@ -300,6 +310,7 @@ words:
   - vtuber
   - vueuse
   - waapi
+  - Waifu
   - warpdrive
   - Warudo
   - wavefile

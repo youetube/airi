@@ -59,6 +59,18 @@ const menu = computed(() => [
     icon: 'i-solar:chart-bold-duotone',
     to: '/devtools/beat-sync',
   },
+  {
+    title: 'WebSocket Inspector',
+    description: 'Inspect raw WebSocket traffic',
+    icon: 'i-solar:transfer-horizontal-bold-duotone',
+    to: '/devtools/websocket-inspector',
+  },
+  {
+    title: 'Screen Capture',
+    description: 'Capture screen or window as video and/or audio streams',
+    icon: 'i-solar:screen-share-bold-duotone',
+    to: '/devtools/screen-capture',
+  },
 ])
 
 const openDevTools = useElectronEventaInvoke(electronOpenMainDevtools)
@@ -157,6 +169,8 @@ const openMarkdownStressWindow = useElectronEventaInvoke(electronOpenDevtoolsWin
 <route lang="yaml">
 meta:
   layout: settings
+  titleKey: settings.pages.system.developer.title
+  subtitleKey: settings.title
   stageTransition:
     name: slide
 </route>

@@ -24,16 +24,23 @@ dialogs:
     skipForNow: Omitir por ahora
     saveAndContinue: Guardar y Continuar
     next: Siguiente
-    retry: Retry
+    retry: Volver a intentar
     start: '¡Hagámoslo!'
     select-model: Elegir modelo
-    no-models: No available models
+    no-models: Ningún modelo disponible
     no-models-help: >-
-      Please return to the previous step and check your API key, or check the network connection.
+      Por favor vuelva al paso anterior y compruebe su clave de API o su conexión de red.
 language:
   title: Idioma
   description: >
     Cambia el idioma de la interfaz de AIRI. Esto no afectará el idioma de las respuestas del personaje.
+controls-island:
+  icon-size:
+    title: Tamaño de icono de la isla de controles
+    description: Ajusta el tamaño de los iconos de la isla de controles
+    auto: Automático (adaptativo)
+    large: Grande (predeterminado)
+    small: Pequeño
 live2d:
   change-model:
     from-file: Cargar desde Archivo
@@ -64,6 +71,11 @@ live2d:
     title: Desactivar seguimiento del ratón del modelo
     button-disable:
       title: Desactivar
+  fps:
+    title: FPS
+    description: Limit rendering frame rate
+    options:
+      unlimited: No Limit
 microphone: Micrófono
 models: Modelo
 pages:
@@ -71,10 +83,13 @@ pages:
     activate: Activar
     active: Activo
     active_badge: Actualmente Activo
-    cancel: Cancel action
+    cancel: Cancelar operación
+    save: Guardar cambios
     card_not_found: Tarjeta no encontrada
     character: Personaje
     close: Cerrar
+    chat:
+      provider: Chat / Provider
     consciousness:
       model: Consciencia / Modelo
     created_by: creado por
@@ -86,6 +101,7 @@ pages:
     description_label: Descripción
     drop_here: Suelta para subir
     create_card: Crear una nueva Tarjeta
+    edit_card: Modificar tarjeta
     creation:
       identity: Identidad
       name: Nombre
@@ -102,6 +118,9 @@ pages:
         scenario: Recientemente despertaste y olvidaste todo sobre tu vida anterior.
         systemprompt: Recibirás mensajes, respóndelos como un humano real.
         posthistoryinstructions: Recuerda imitar a un humano.
+      modules_info: Configure modules for this character card. If not set, default module configuration will be used.
+      use_default: Use default
+      use_default_not_configured: Use default (not configured)
       fields_info:
         subtitle: >-
           Puedes poner aquí algunos detalles sobre el personaje que estás creando, explicar su historia y contexto, y cómo deben responderse tus interacciones.
@@ -118,6 +137,8 @@ pages:
         posthistoryinstructions: Coloca aquí cualquier cosa que el LLM de IA deba leer después del historial de mensajes.
         version: >-
           Versión de la tarjeta, deberías aumentar esto si estás haciendo cambios desde una tarjeta anterior.
+        consciousness_model: Select the consciousness model (AI model) for this character.
+        speech_model: Select the speech synthesis model and voice for this character.
       errors:
         name: El nombre debe ser válido o no estar vacío.
         version: '¡Error: Número de versión inválido!'
@@ -138,6 +159,7 @@ pages:
     search: Buscar tarjetas...
     sort_by: Ordenar por
     speech:
+      provider: Speech / Provider
       model: Habla / Modelo
       voice: Habla / Voz
     systemprompt: Prompt del Sistema
@@ -149,19 +171,19 @@ pages:
     description: Donde se almacenan y organizan las memorias
     title: Memoria
   data:
-    title: Data
-    description: Manage stored AIRI data, exports, and resets
+    title: Datos
+    description: Administrar, exportar y restablecer los datos de AIRI
     sections:
       chats:
-        title: Chat sessions
-        description: Export or import saved chat sessions.
-        export: Export chats
-        import: Import chats
-        delete: Delete all chat sessions
+        title: Conversaciones
+        description: Importar o exportar conversaciones.
+        export: Exportar conversaciones
+        import: Importar conversaciones
+        delete: Borrar todas las conversaciones
       models:
-        title: Models
-        description: Remove imported Live2D/VRM models.
-        delete: Delete all models
+        title: Modelos
+        description: Borrar modelos Live2D/VRM importados.
+        delete: Borrar todos los modelos
       modules:
         title: Modules
         description: Reset module preferences and credentials.
@@ -280,7 +302,7 @@ pages:
             search_results: Encontrados {count} de {total} modelos
             show_less: Mostrar menos
             show_more: Mostrar más
-            subtitle: Selecciona un modelo del proveedor
+            subtitle: Select a default model from the provider
             title: Modelo
       title: Consciencia
     description: Pensamiento, visión, síntesis de voz, juegos, etc.
@@ -343,6 +365,7 @@ pages:
               stop:
                 label: Detener
             select-voice:
+              loading: Loading model...
               required: Por favor selecciona una voz
           provider-voice-selection:
             custom_model_placeholder: Ingresa el nombre del modelo personalizado...
@@ -592,6 +615,30 @@ pages:
           validation:
             error-missing-api-key: Por favor ingresa una clave API para probar la voz.
         title: ElevenLabs
+      kokoro-local:
+        description: Local text-to-speech using Kokoro-82M.
+        fields:
+          field:
+            model:
+              label: Model Selection
+              description: Smaller models load faster but may have slightly lower quality.
+        models:
+          fp32-webgpu:
+            description: Full precision model using WebGPU - Recommended for supported devices
+          fp32:
+            description: Full precision model
+          fp16:
+            description: Half precision
+          q8:
+            description: 8-bit quantized
+          q4:
+            description: 4-bit quantized
+          q4f16:
+            description: 4-bit with FP16
+        playground:
+          default-text: Hello! This is a test of the Kokoro text-to-speech system.
+          title: Voice Playground
+        title: Kokoro TTS (Local)
       fireworks:
         description: fireworks.ai
         title: Fireworks.ai
@@ -606,6 +653,8 @@ pages:
       index-tts-vllm:
         description: https://index-tts.github.io/
         title: Bilibili / IndexTTS
+        callout_indextts2_unavailable_title: Limited Support
+        callout_indextts2_unavailable: Support for IndexTTS2 is currently unavailable. Please use IndexTTS.
       azure-ai-foundry:
         description: Azure AI Foundry
         title: Azure AI Foundry
@@ -630,6 +679,9 @@ pages:
       openai-compatible:
         description: OpenAI Compatible
         title: OpenAI Compatible
+      n1n:
+        description: n1n.ai - High-performance AI API provider.
+        title: n1n
       openrouter:
         description: openrouter.ai
         title: OpenRouter
@@ -680,10 +732,20 @@ pages:
       aliyun-nls:
         description: Aliyun NLS
         title: Aliyun NLS
+      browser-web-speech-api:
+        description: Browser-native STT (requires Chrome/Edge/Safari)
+        title: Web Speech API
       transcriptions:
         playground:
           title: Playground de Transcripción
     title: Proveedores
+  connection:
+    description: Configure WebSocket server connection
+    title: Connection
+    websocket-url:
+      description: Full address of the WebSocket server (e.g., ws://localhost:6121/ws)
+      label: WebSocket Server Address
+      placeholder: ws://localhost:6121/ws
   scene:
     description: Configurar el entorno donde vive el personaje
     title: Escena
@@ -721,6 +783,41 @@ pages:
               use-magic-keys:
                 title: useMagicKeys
                 description: Test shortcuts
+              audio-record:
+                title: Audio Record
+                description: Test Audio related composables
+              background-gradient-blending:
+                title: Background Theme color blending
+                description: Test blending & theme
+              background-removal:
+                title: Background removal (WebGPU required)
+                description: Utility for background removal
+              chat:
+                title: Chat
+                description: Chat
+              gesture-circle:
+                title: Gesture Circle (Desktop only)
+                description: Test gesture recognition
+              image:
+                title: Image
+                description: Image
+              polaroid:
+                title: Polaroid
+                description: Utility for taking shots of models
+              context-flow:
+                description: Inspect incoming context updates and outgoing chat stream events
+              websocket-inspector:
+                title: WebSocket Inspector
+                description: Inspect raw WebSocket traffic
+              vibrant:
+                title: Color extract
+                description: Test color extraction
+              providers-transcription-realtime-aliyun-nls:
+                title: Aliyun Real-time Transcriber
+                description: Stream microphone audio to Aliyun NLS and inspect live transcripts
+              performance-playground:
+                title: Performance Playground
+                description: 'Test performance runtime: VRM expressions + TTS lip sync'
         theme-presets:
           presets:
             default:
@@ -846,6 +943,10 @@ vrm:
   skybox:
     skybox-intensity: SkyBox Intensity
     skybox-specular-mix: Specular Mix
+websocket-secure-enabled:
+  title: Habilitar WebSocket Seguro (WSS)
+  description: >-
+    Habilite WSS (WebSocket Secure) para permitir conexiones HTTPS para móvil (pocket) en modo de desarrollo. Esto generará automáticamente un certificado autofirmado.
 wip:
   title: Work in Progress
   description: >-

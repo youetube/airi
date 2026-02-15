@@ -1,21 +1,35 @@
 import type { Session, User } from 'better-auth'
 
-import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
+import { fetchSession } from '../libs/auth'
+
 export const useAuthStore = defineStore('auth', () => {
-  const authToken = useLocalStorage('auth/token', '')
   const user = ref<User>()
   const session = ref<Session>()
   const isAuthenticated = computed(() => !!user.value && !!session.value)
+  const userId = computed(() => user.value?.id ?? 'local')
 
-  // TODO: include fetchSession here for pulling and updating better-auth session with initialize(...) action
+  const isLoginOpen = ref(false)
+
+  const initialized = ref(false)
+  const initialize = () => {
+    if (initialized.value)
+      return
+
+    fetchSession().catch(() => {})
+
+    initialized.value = true
+  }
+
+  initialize()
 
   return {
-    authToken,
     user,
+    userId,
     session,
     isAuthenticated,
+    isLoginOpen,
   }
 })

@@ -69,6 +69,12 @@ const menu = computed(() => [
     to: '/devtools/context-flow',
   },
   {
+    title: 'WebSocket Inspector',
+    description: 'Inspect raw WebSocket traffic',
+    icon: 'i-solar:transfer-horizontal-bold-duotone',
+    to: '/devtools/websocket-inspector',
+  },
+  {
     title: t('settings.pages.system.sections.section.developer.sections.section.use-magic-keys.title'),
     description: t('settings.pages.system.sections.section.developer.sections.section.use-magic-keys.description'),
     icon: 'i-solar:sledgehammer-bold-duotone',
@@ -164,6 +170,8 @@ const menu = computed(() => [
 <route lang="yaml">
 meta:
   layout: settings
+  titleKey: settings.pages.system.developer.title
+  subtitleKey: settings.title
   stageTransition:
     name: slide
 </route>

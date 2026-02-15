@@ -1,4 +1,5 @@
-import { refManualReset, useBroadcastChannel, useLocalStorage } from '@vueuse/core'
+import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
+import { useBroadcastChannel } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 
@@ -36,10 +37,13 @@ export const defaultModelParameters = {
 
 export const useLive2d = defineStore('live2d', () => {
   const { post, data } = useBroadcastChannel<BroadcastChannelEvents, BroadcastChannelEvents>({ name: 'airi-stores-live2d' })
-  const shouldUpdateViewHooks = ref<Array<() => void>>([])
+  const shouldUpdateViewHooks = ref(new Set<() => void>())
 
   const onShouldUpdateView = (hook: () => void) => {
-    shouldUpdateViewHooks.value.push(hook)
+    shouldUpdateViewHooks.value.add(hook)
+    return () => {
+      shouldUpdateViewHooks.value.delete(hook)
+    }
   }
 
   function shouldUpdateView() {
@@ -53,18 +57,18 @@ export const useLive2d = defineStore('live2d', () => {
     }
   })
 
-  const position = refManualReset<{ x: number, y: number }>(useLocalStorage('settings/live2d/position', { x: 0, y: 0 })) // position is relative to the center of the screen, units are %
+  const position = useLocalStorageManualReset<{ x: number, y: number }>('settings/live2d/position', { x: 0, y: 0 }) // position is relative to the center of the screen, units are %
   const positionInPercentageString = computed(() => ({
     x: `${position.value.x}%`,
     y: `${position.value.y}%`,
   }))
-  const currentMotion = refManualReset<{ group: string, index?: number }>(() => ({ group: 'Idle', index: 0 }))
-  const availableMotions = refManualReset<{ motionName: string, motionIndex: number, fileName: string }[]>(() => [])
-  const motionMap = refManualReset<Record<string, string>>(useLocalStorage('settings/live2d/motion-map', {}))
-  const scale = refManualReset<number>(useLocalStorage('settings/live2d/scale', 1))
+  const currentMotion = useLocalStorageManualReset<{ group: string, index?: number }>('settings/live2d/current-motion', () => ({ group: 'Idle', index: 0 }))
+  const availableMotions = useLocalStorageManualReset<{ motionName: string, motionIndex: number, fileName: string }[]>('settings/live2d/available-motions', () => [])
+  const motionMap = useLocalStorageManualReset<Record<string, string>>('settings/live2d/motion-map', {})
+  const scale = useLocalStorageManualReset('settings/live2d/scale', 1)
 
   // Live2D model parameters
-  const modelParameters = refManualReset<Record<string, number>>(useLocalStorage('settings/live2d/parameters', defaultModelParameters))
+  const modelParameters = useLocalStorageManualReset<Record<string, number>>('settings/live2d/parameters', defaultModelParameters)
 
   function resetState() {
     position.reset()

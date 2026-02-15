@@ -38,6 +38,7 @@ export default defineConfig({
     // Thanks to [@Maqsyo](https://github.com/Maqsyo)
     // https://github.com/alex8088/electron-vite/issues/99#issuecomment-1862671727
     base: './',
+
     build: {
       rolldownOptions: {
         input: {
@@ -46,12 +47,14 @@ export default defineConfig({
         },
       },
     },
+
     optimizeDeps: {
       exclude: [
         // Internal Packages
         '@proj-airi/stage-ui/*',
         '@proj-airi/drizzle-duckdb-wasm',
         '@proj-airi/drizzle-duckdb-wasm/*',
+        '@proj-airi/electron-screen-capture',
 
         // Static Assets: Models, Images, etc.
         'src/renderer/public/assets/*',
@@ -73,6 +76,7 @@ export default defineConfig({
         '@framework/model/cubismmoc',
       ],
     },
+
     resolve: {
       alias: {
         '@proj-airi/server-sdk': resolve(join(import.meta.dirname, '..', '..', 'packages', 'server-sdk', 'src')),
@@ -82,12 +86,22 @@ export default defineConfig({
         '@proj-airi/stage-shared': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-shared', 'src')),
       },
     },
+
     server: {
       warmup: {
         clientFiles: [
           `${resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src'))}/*.vue`,
           `${resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src'))}/*.vue`,
         ],
+      },
+    },
+
+    worker: {
+      format: 'es',
+      rollupOptions: {
+        output: {
+          inlineDynamicImports: false,
+        },
       },
     },
 
@@ -129,9 +143,16 @@ export default defineConfig({
       VueRouter({
         dts: resolve(import.meta.dirname, 'src/renderer/typed-router.d.ts'),
         routesFolder: [
+          {
+            src: resolve(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src', 'pages'),
+            exclude: base => [
+              ...base,
+              '**/settings/system/general.vue',
+            ],
+          },
           resolve(import.meta.dirname, 'src', 'renderer', 'pages'),
-          resolve(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src', 'pages'),
         ],
+        exclude: ['**/components/**'],
       }),
 
       VitePluginVueDevTools(),
